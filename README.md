@@ -8,7 +8,8 @@ For example, this logging is produced:
 
 2023-02-16T12:22:**16**.495-05:00   INFO World!
 
-Note the 5 second interval between the "Hello" and "Word" logging. Meanwhile the request responds in a few milliseconds.
+Note the 5 second interval between the "Hello" and "World!" logging. 
+Meanwhile the Api Gateway request responds in a few milliseconds.
 
 
 References:
