@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+    Function:
+       
+        CodeUri: functions/
+        Runtime: nodejs14.x
+        MemorySize: 128
+     
+Resources:
+    FunctionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Action:
+                          - sts:AssumeRole
+                      Principal:
+                          Service:
+                              - lambda.amazonaws.com
+            Path: /
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+    Sync:
+        Type: AWS::Serverless::Function
+        Properties:
+            Timeout: 5
+            Role: !GetAtt FunctionRole.Arn
+            Handler: sync.handler
+        Metadata:
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: 'es2020'
+                Sourcemap: true
+                External:
+                    - 'aws-sdk'
+                EntryPoints:
+                    - sync.ts
+    Async:
+        Type: AWS::Serverless::Function
+        Properties:
+            Timeout: 10
+            Role: !GetAtt FunctionRole.Arn
+            Handler: async.handler
+        Metadata:
+            BuildMethod: esbuild
+            BuildProperties:
+                Minify: true
+                Target: 'es2020'
+                Sourcemap: true
+                External:
+                    - 'aws-sdk'
+                EntryPoints:
+                    - async.ts              
+    
+    SyncPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - MyRestApi
+            - Sync
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref Sync
+            Principal: apigateway.amazonaws.com
+    AsyncPermission:
+        Type: AWS::Lambda::Permission
+        DependsOn:
+            - MyRestApi
+            - Sync
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !Ref Async
+            Principal: apigateway.amazonaws.com        
+
+    MyRestApi:
+        Type: AWS::Serverless::Api
+        Properties:
+            StageName: Prod
+            DefinitionBody:
+                Fn::Transform:
+                    Name: AWS::Include
+                    Parameters:
+                        Location: api.yaml #Open API definition        
+
+Outputs:
+    ApiUrl:
+        Description: API Url
+        Value: !Sub https://${MyRestApi}.execute-api.${AWS::Region}.amazonaws.com
+
+

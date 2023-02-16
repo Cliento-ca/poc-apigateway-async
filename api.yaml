@@ -1,0 +1,46 @@
+openapi: 3.0.2
+info:
+    title: MyRestApi
+    version: 0.0.1
+
+
+paths:
+    /sync:
+        post:
+            summary: Sync invoke
+            operationId: sync
+            responses:
+                200:
+                    description: ok
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                  message:
+                                    type: string
+
+            x-amazon-apigateway-integration: 
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Sync.Arn}/invocations
+    /async:
+        post:
+            summary: Async invoke
+            operationId: async
+            responses:
+                200:
+                    description: ok
+            x-amazon-apigateway-integration: 
+                httpMethod: POST
+                type: aws
+                uri:
+                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Async.Arn}/invocations
+                responses:
+                    default: 
+                        statusCode: 200
+                requestParameters:         
+                    integration.request.header.X-Amz-Invocation-Type: "'Event'"
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"

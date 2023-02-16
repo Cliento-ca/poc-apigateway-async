@@ -1,0 +1,15 @@
+{
+  "name": "poc-apigateway-async",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.110",
+    "aws-sdk": "^2.1316.0"
+  }
+}
