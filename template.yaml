@@ -9,6 +9,7 @@ Globals:
         MemorySize: 128
      
 Resources:
+    
     FunctionRole:
         Type: AWS::IAM::Role
         Properties:
@@ -81,12 +82,12 @@ Resources:
         Type: AWS::Serverless::Api
         Properties:
             StageName: Prod
+          
             DefinitionBody:
                 Fn::Transform:
                     Name: AWS::Include
                     Parameters:
-                        Location: api.yaml #Open API definition        
-
+                        Location: api.yaml 
 Outputs:
     ApiUrl:
         Description: API Url

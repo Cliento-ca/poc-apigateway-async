@@ -29,6 +29,13 @@ paths:
         post:
             summary: Async invoke
             operationId: async
+            parameters:
+                - name: type
+                  in: query
+                  description: query string
+                  required: false
+                  schema:
+                      type: string
             responses:
                 200:
                     description: ok
@@ -37,10 +44,23 @@ paths:
                 type: aws
                 uri:
                     Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Async.Arn}/invocations
+                requestTemplates: 
+                    application/json: |
+                        {
+                            "queryStringParameters": {
+                                "type": "$input.params('type')"
+                            },
+                            "context": {
+                                "authorizer": {
+                                    "claims": "$context.authorizer.claims"
+                                }
+                            }
+                        }    
                 responses:
                     default: 
                         statusCode: 200
                 requestParameters:         
                     integration.request.header.X-Amz-Invocation-Type: "'Event'"
+                    integration.request.querystring.type: method.request.querystring.type
                 passthroughBehavior: "when_no_match"
                 contentHandling: "CONVERT_TO_TEXT"
