@@ -36,6 +36,19 @@ paths:
                   required: false
                   schema:
                       type: string
+            requestBody:
+                required: true
+                description: Post Data
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties: 
+                                worksheetIds: 
+                                    type: array
+                                    items:
+                                        type: integer
+
             responses:
                 200:
                     description: ok
@@ -47,6 +60,7 @@ paths:
                 requestTemplates: 
                     application/json: |
                         {
+                            "body" : $input.json('$'),
                             "queryStringParameters": {
                                 "type": "$input.params('type')"
                             },
